@@ -1,0 +1,40 @@
+{
+  "n_seeds": 10,
+  "hyperparameters": {
+    "hidden": [
+      16,
+      8
+    ],
+    "lr": 0.03,
+    "batch": 32,
+    "l2": 0.001,
+    "local_epochs": 3,
+    "rounds": 40
+  },
+  "features": [
+    "age",
+    "trestbps",
+    "chol",
+    "thalach",
+    "oldpeak",
+    "sex",
+    "fbs",
+    "exang",
+    "cp_1",
+    "cp_2",
+    "cp_3",
+    "cp_4",
+    "restecg_0",
+    "restecg_1",
+    "restecg_2"
+  ],
+  "usable_records": {
+    "Cleveland": 282,
+    "Hungarian": 294,
+    "VA Long Beach": 200
+  },
+  "early_stop_round_median": {
+    "FedAvg": 8.0,
+    "Centralized": 3.5
+  }
+}

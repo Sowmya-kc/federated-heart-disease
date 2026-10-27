@@ -1,0 +1,13 @@
+site,method,acc,f1,auc
+Cleveland,Centralized,0.789,0.758,0.876
+Cleveland,FedAvg,0.798,0.766,0.876
+Cleveland,FedProx,0.793,0.762,0.876
+Cleveland,Local-only,0.789,0.757,0.87
+Hungarian,Centralized,0.788,0.699,0.87
+Hungarian,FedAvg,0.785,0.695,0.87
+Hungarian,FedProx,0.778,0.686,0.864
+Hungarian,Local-only,0.785,0.699,0.865
+VA Long Beach,Centralized,0.753,0.846,0.656
+VA Long Beach,FedAvg,0.75,0.843,0.661
+VA Long Beach,FedProx,0.75,0.843,0.662
+VA Long Beach,Local-only,0.735,0.839,0.584
