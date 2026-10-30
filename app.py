@@ -15,6 +15,30 @@ NAMES = {"age": "Age", "sex": "Sex", "cp": "Chest pain type", "trestbps": "Blood
 
 st.title("🫀 Privacy-Preserving Federated Heart Disease Prediction")
 st.caption("No patient record was ever shared.")
+st.info("""
+### Federated Learning Model
+
+**Architecture**
+
+Input features  
+↓  
+Dense Layer (16 neurons)  
+↓  
+ReLU activation  
+↓  
+Dense Layer (8 neurons)  
+↓  
+ReLU activation  
+↓  
+Sigmoid output (heart disease probability)
+
+**Training method**
+
+- Algorithm: Federated Averaging (FedAvg)
+- Hospitals: Cleveland, Hungarian, VA Long Beach
+- Patient records: Never shared
+- Only model updates are exchanged
+""")
 
 if not (os.path.exists(MODEL) and os.path.exists(LOG)):
     st.error("No trained model found. Run  `python run_federation.py`  first, then reload this page.")
@@ -60,7 +84,8 @@ with tab1:
         st.subheader("Model estimate")
         st.metric("Estimated probability of heart disease", f"{risk:.0%}")
         st.progress(min(max(risk, 0.0), 1.0))
-        if model.coverage_warnings(patient):
+        warnings = model.coverage_warnings(patient)
+        if warnings:
             st.info("No low / moderate / high verdict is given: this patient is unlike the training patients, "
                     "so the number above is for reference only.")
         elif risk >= 0.6:
@@ -72,7 +97,7 @@ with tab1:
         st.caption("Bands (low / moderate / high) are illustrative only, not clinical thresholds.")
         label = {"age": "Age", "trestbps": "Resting blood pressure", "chol": "Cholesterol",
                  "thalach": "Max heart rate", "oldpeak": "ST depression"}
-        for c, v, lo, hi in model.coverage_warnings(patient):
+        for c, v, lo, hi in warnings:
             st.warning(f"⚠️ **{label[c]} = {v:g} is unusual for the training patients** (typical range about "
                        f"{max(lo, 0):.0f}–{hi:.0f}). The model is extrapolating here, so treat this estimate as unreliable.")
 
@@ -117,6 +142,18 @@ with tab2:
     vh = pd.Series(log["val_loss_history"], name="validation loss")
     vh.index.name = "communication round"
     st.line_chart(vh)
+    st.subheader("Accuracy improvement during training")
+
+round_history = pd.DataFrame(log["rounds"])
+
+if "accuracy" in round_history.columns:
+    st.line_chart(
+        round_history.set_index("round")["accuracy"]
+    )
+else:
+    st.caption(
+        "Accuracy history was not stored during this training run."
+    )
     st.caption(f"The server kept the global model from round {log['best_round']} (lowest validation loss). "
                "Validation loss is computed by the hospitals on their own data.")
 
