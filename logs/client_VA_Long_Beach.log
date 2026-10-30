@@ -1,0 +1,19 @@
+[VA Long Beach] loaded 200 local patients (136 train / 24 val / 40 test)
+[VA Long Beach] sent summary statistics (no patient rows)
+[VA Long Beach] round 1: trained locally, sent weight update
+[VA Long Beach] round 2: trained locally, sent weight update
+[VA Long Beach] round 3: trained locally, sent weight update
+[VA Long Beach] round 4: trained locally, sent weight update
+[VA Long Beach] round 5: trained locally, sent weight update
+[VA Long Beach] round 6: trained locally, sent weight update
+[VA Long Beach] round 7: trained locally, sent weight update
+[VA Long Beach] round 8: trained locally, sent weight update
+[VA Long Beach] round 9: trained locally, sent weight update
+[VA Long Beach] round 10: trained locally, sent weight update
+[VA Long Beach] round 11: trained locally, sent weight update
+[VA Long Beach] round 12: trained locally, sent weight update
+[VA Long Beach] round 13: trained locally, sent weight update
+[VA Long Beach] round 14: trained locally, sent weight update
+[VA Long Beach] round 15: trained locally, sent weight update
+[VA Long Beach] final local test accuracy of the global model: 0.725
+[VA Long Beach] federation finished

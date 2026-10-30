@@ -37,6 +37,19 @@ class HeartRiskModel:
         """Probability (0-1) that the patient has heart disease."""
         return float(self.net.predict_proba(self._features([patient]))[0])
 
+    def coverage_warnings(self, patient, z_max=2.5):
+        """Numeric inputs that are unusual compared with the patients the model was trained on
+        (more than z_max standard deviations from the federated training average)."""
+        out = []
+        for i, c in enumerate(NUMERIC):
+            v = patient.get(c)
+            if v is None:
+                continue
+            z = (v - self.mu[i]) / self.sd[i]
+            if abs(z) > z_max:
+                out.append((c, v, float(self.mu[i] - z_max * self.sd[i]), float(self.mu[i] + z_max * self.sd[i])))
+        return out
+
     def explain(self, patient):
         """For each input: how many probability points it adds/removes compared with a 'typical'
         (median) value of that input, all other inputs unchanged. Positive = raises the risk."""

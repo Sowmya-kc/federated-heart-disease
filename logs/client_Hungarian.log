@@ -1,0 +1,19 @@
+[Hungarian] loaded 294 local patients (199 train / 36 val / 59 test)
+[Hungarian] sent summary statistics (no patient rows)
+[Hungarian] round 1: trained locally, sent weight update
+[Hungarian] round 2: trained locally, sent weight update
+[Hungarian] round 3: trained locally, sent weight update
+[Hungarian] round 4: trained locally, sent weight update
+[Hungarian] round 5: trained locally, sent weight update
+[Hungarian] round 6: trained locally, sent weight update
+[Hungarian] round 7: trained locally, sent weight update
+[Hungarian] round 8: trained locally, sent weight update
+[Hungarian] round 9: trained locally, sent weight update
+[Hungarian] round 10: trained locally, sent weight update
+[Hungarian] round 11: trained locally, sent weight update
+[Hungarian] round 12: trained locally, sent weight update
+[Hungarian] round 13: trained locally, sent weight update
+[Hungarian] round 14: trained locally, sent weight update
+[Hungarian] round 15: trained locally, sent weight update
+[Hungarian] final local test accuracy of the global model: 0.729
+[Hungarian] federation finished

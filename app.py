@@ -9,10 +9,12 @@ from predict import HeartRiskModel
 
 st.set_page_config(page_title="Federated Heart Disease Prediction", page_icon="🫀", layout="wide")
 MODEL, LOG = "models/global_model.npz", "models/training_log.json"
+NAMES = {"age": "Age", "sex": "Sex", "cp": "Chest pain type", "trestbps": "Blood pressure", "chol": "Cholesterol",
+         "fbs": "Fasting blood sugar", "restecg": "Resting ECG", "thalach": "Max heart rate",
+         "exang": "Exercise angina", "oldpeak": "ST depression"}
 
 st.title("🫀 Privacy-Preserving Federated Heart Disease Prediction")
-st.caption("CMR University capstone · model trained by 3 simulated hospitals (Cleveland, Hungarian, VA Long Beach) "
-           "using Federated Averaging. No patient record was ever shared.")
+st.caption("No patient record was ever shared.")
 
 if not (os.path.exists(MODEL) and os.path.exists(LOG)):
     st.error("No trained model found. Run  `python run_federation.py`  first, then reload this page.")
@@ -58,13 +60,21 @@ with tab1:
         st.subheader("Model estimate")
         st.metric("Estimated probability of heart disease", f"{risk:.0%}")
         st.progress(min(max(risk, 0.0), 1.0))
-        if risk >= 0.6:
+        if model.coverage_warnings(patient):
+            st.info("No low / moderate / high verdict is given: this patient is unlike the training patients, "
+                    "so the number above is for reference only.")
+        elif risk >= 0.6:
             st.warning("The model estimates a **high** likelihood of heart disease for this input.")
         elif risk >= 0.3:
             st.info("The model estimates a **moderate** likelihood for this input.")
         else:
             st.success("The model estimates a **low** likelihood for this input.")
         st.caption("Bands (low / moderate / high) are illustrative only, not clinical thresholds.")
+        label = {"age": "Age", "trestbps": "Resting blood pressure", "chol": "Cholesterol",
+                 "thalach": "Max heart rate", "oldpeak": "ST depression"}
+        for c, v, lo, hi in model.coverage_warnings(patient):
+            st.warning(f"⚠️ **{label[c]} = {v:g} is unusual for the training patients** (typical range about "
+                       f"{max(lo, 0):.0f}–{hi:.0f}). The model is extrapolating here, so treat this estimate as unreliable.")
 
         st.markdown("**What pushed this estimate up or down?**")
         names = {"age": "Age", "sex": "Sex", "cp": "Chest pain type", "trestbps": "Blood pressure", "chol": "Cholesterol",
@@ -95,7 +105,13 @@ with tab2:
     st.subheader("Per-hospital results")
     pc = pd.DataFrame(log["per_client_test"]).T.rename(columns={"n": "test patients", "acc": "accuracy", "prec": "precision",
                                                                 "rec": "recall", "f1": "F1", "auc": "AUC"})
+    pc.index = [i.replace("_", " ") for i in pc.index]
     st.dataframe(pc.drop(columns="loss").round(3), width="stretch")
+    st.caption(f"Read with care: each hospital's test set is small ({int(pc['test patients'].min())}–{int(pc['test patients'].max())} "
+               "patients, so one patient is worth about 2 points of accuracy) and this is a single train/test split; "
+               "the 10-split study in `results/` is more stable. In the public VA Long Beach data about 75 % of patients have "
+               "heart disease, so answering 'disease' for everyone would already score about 0.75 accuracy; "
+               f"look at AUC instead. The lowest AUC here is {pc['AUC'].idxmin()} ({pc['AUC'].min():.2f}; 0.5 = random guessing).")
 
     st.subheader("Training progress (federated validation loss per round)")
     vh = pd.Series(log["val_loss_history"], name="validation loss")
@@ -105,10 +121,17 @@ with tab2:
                "Validation loss is computed by the hospitals on their own data.")
 
     st.subheader("Which inputs does the federated model rely on?")
-    imp = pd.Series(log["importance"]).sort_values()
-    st.bar_chart(imp.rename("increase in loss when the input is shuffled"))
+    imp = pd.Series(log["importance"]).rename(index=NAMES).sort_values()
+    fig2, ax2 = plt.subplots(figsize=(7, 3.6))
+    ax2.barh(imp.index, imp.values, color=["#2e86c1" if v > 0 else "#999999" for v in imp.values])
+    ax2.axvline(0, color="k", lw=0.8)
+    ax2.set_xlabel("Increase in loss when this input is shuffled (higher = model relies on it more)")
+    plt.tight_layout()
+    st.pyplot(fig2)
+    plt.close(fig2)
     st.caption("Permutation importance computed locally at each hospital and averaged by the server. "
-               "Small test sets make this noisy; differences between low-ranked inputs are not reliable.")
+               "Small test sets make this noisy; differences between low-ranked inputs are not reliable. "
+               "A value at or below zero (grey) means shuffling that input did not hurt the model, so it contributes nothing reliable.")
 
 # ------------------------------------------------------------------ tab 3
 with tab3:
@@ -123,5 +146,7 @@ summary numbers, never from patient rows.
 - The VA Long Beach data is 97 % male with 75 % disease prevalence, so the population is not representative of the general public.
 - About a quarter of VA values are missing and were imputed; `ca` and `thal` were dropped because they are missing for 80–99 % of two hospitals.
 - Weight updates can still leak information. Optional clipping + noise is available in the code, but no formal (ε, δ) privacy guarantee is computed.
+- The public datasets contain no women under 30 and only 6 under 35 (ages 28–77 overall), so predictions for young patients are extrapolation; the app warns when an input is far outside the training range.
+- "No chest pain (asymptomatic)" is associated with disease in these datasets (74 % of such patients), because people without symptoms were mostly tested when something else was suspected. The model learned this dataset pattern; it is not a clinical rule.
 - Test sets are small (about 150 patients), so scores vary by a few percentage points from run to run.
 """)

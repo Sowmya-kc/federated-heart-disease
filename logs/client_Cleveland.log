@@ -1,0 +1,19 @@
+[Cleveland] loaded 282 local patients (191 train / 34 val / 57 test)
+[Cleveland] sent summary statistics (no patient rows)
+[Cleveland] round 1: trained locally, sent weight update
+[Cleveland] round 2: trained locally, sent weight update
+[Cleveland] round 3: trained locally, sent weight update
+[Cleveland] round 4: trained locally, sent weight update
+[Cleveland] round 5: trained locally, sent weight update
+[Cleveland] round 6: trained locally, sent weight update
+[Cleveland] round 7: trained locally, sent weight update
+[Cleveland] round 8: trained locally, sent weight update
+[Cleveland] round 9: trained locally, sent weight update
+[Cleveland] round 10: trained locally, sent weight update
+[Cleveland] round 11: trained locally, sent weight update
+[Cleveland] round 12: trained locally, sent weight update
+[Cleveland] round 13: trained locally, sent weight update
+[Cleveland] round 14: trained locally, sent weight update
+[Cleveland] round 15: trained locally, sent weight update
+[Cleveland] final local test accuracy of the global model: 0.895
+[Cleveland] federation finished
